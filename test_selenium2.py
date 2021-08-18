@@ -75,21 +75,20 @@ else:
     new_df.to_csv(csv_file_name, mode = 'a', index = False, header = False)
     new_df = pandas.concat([current_df, new_df])
 
+# plot the views versus date
 date_num=[]
 date_list = new_df['date'].tolist()
 for data in date_list :
     temp = datetime.strptime(data, "%d/%m/%Y") #temp: datetime
     date_num.append(md.date2num(temp))
-    
-new_df['views']=new_df['views'].div(1000)
 
-# plot the views versus date
+new_df['views']=new_df['views'].div(1000)
 y = new_df['views'].tolist()
 
 fig = figure()
 ax = fig.add_subplot(111)
-ax.plot_date(date_num, y, '-')  #將日期及營收傳入繪圖函式
-fig.autofmt_xdate()
+ax.plot_date(date_num, y, '-')  
+fig.autofmt_xdate() #change to date
 show()
 
 
