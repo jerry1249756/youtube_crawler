@@ -2,8 +2,10 @@ import time
 import re
 import pandas
 import matplotlib.pyplot as plt
+import matplotlib.dates as md
+from pylab import figure, show
 from selenium import webdriver
-from datetime import date
+from datetime import date, datetime
 
 driver = webdriver.Chrome()
 driver.set_page_load_timeout(10)
@@ -33,9 +35,9 @@ like = int(like[:6].replace(',',''))
 dislike = int(dislike[:3].replace(',',''))
 view = int(view[5:].replace(',',''))
 
-print(like)
-print(dislike)
-print(view)
+print('likes: ',like)
+print('dislikes: ',dislike)
+print('views: ',view)
 
 # scroll down the page to search for commentCounts(data rendered),
 # 20000 may be not enough for some cases
@@ -46,7 +48,7 @@ driver.execute_script(js)
 time.sleep(3)
 c_id = driver.find_element_by_xpath('//*[@id="count"]/yt-formatted-string/span[1]')
 comment = int(c_id.text)
-print(comment)
+print('comments: ',comment)
 driver.close()
 
 # write the data into the csv
@@ -73,16 +75,22 @@ else:
     new_df.to_csv(csv_file_name, mode = 'a', index = False, header = False)
     new_df = pandas.concat([current_df, new_df])
 
+date_num=[]
+date_list = new_df['date'].tolist()
+for data in date_list :
+    temp = datetime.strptime(data, "%d/%m/%Y") #temp: datetime
+    date_num.append(md.date2num(temp))
+    
 new_df['views']=new_df['views'].div(1000)
 
 # plot the views versus date
-x = new_df['date']
-y = new_df['views']
+y = new_df['views'].tolist()
 
-plt.plot(x,y)
-plt.xlabel("date")
-plt.ylabel("views(K)")
-plt.show()
+fig = figure()
+ax = fig.add_subplot(111)
+ax.plot_date(date_num, y, '-')  #將日期及營收傳入繪圖函式
+fig.autofmt_xdate()
+show()
 
 
 
